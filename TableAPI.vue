@@ -17,6 +17,7 @@
     }"
     v-bind="$attrs"
   >
+    <!-- Displaying error from API -->
     <template v-if="error" v-slot:no-data>
       <v-alert
         border="top"
@@ -29,6 +30,7 @@
       </v-alert>
     </template>
 
+    <!-- Displaying table filter in headers that have filter enabled -->
     <template
       v-for="h in filterHeaders"
       v-slot:[`header.${h.value}`]="{ header }"
@@ -42,6 +44,7 @@
       {{ header.text }}
     </template>
 
+    <!-- Displaying footer with page information -->
     <template v-slot:footer.page-text="props">
       {{
         $t("common.table.records", {
@@ -52,15 +55,19 @@
       }}
     </template>
 
+    <!-- Displaying button for refreshing data from API -->
     <template slot="footer">
-      <!--div style="position: absolute; left: 10px; bottom: 10px;"-->
       <div style="position: absolute; margin-left: 10px; margin-top: 10px">
         <v-btn icon @click="load()"><v-icon>fa-spinner</v-icon></v-btn>
       </div>
     </template>
 
     <template v-slot:top>
+      <!-- Default slot for displaying content above table -->
       <slot></slot>
+
+      <!-- Optional toolbar that appears at top right above table
+           and contains actions for selected rows, along with download buttons -->
       <v-toolbar
         v-if="topToolbar"
         flat
@@ -69,20 +76,25 @@
         style="position: absolute; right: 10px; z-index: 3"
         class="mt-n10"
       >
+        <!-- Slot 'selected-actions' to display in toolbar if any rows have been selected -->
         <div v-show="selected.length > 0" class="mr-2">
           <slot name="selected-actions"></slot>
         </div>
+
+        <!-- Download table data button -->
         <v-btn icon @click="downloadCSV()">
           <v-icon v-text="downloadIcon"> </v-icon
         ></v-btn>
       </v-toolbar>
     </template>
 
-    <!-- Supported format for columns -->
+    <!-- Supported formats for columns -->
+    <!-- date filter -->
     <template v-for="h in formatDate" v-slot:[`item.${h.value}`]="{ item }">
       {{ item[h.value] | date }}
     </template>
 
+    <!-- datetime filter -->
     <template v-for="h in formatDatetime" v-slot:[`item.${h.value}`]="{ item }">
       {{ item[h.value] | datetime }}
     </template>
@@ -127,6 +139,9 @@ import { mapMutations } from "vuex";
  *  BaseSelect that adds 'FieldName|==|value' to Filters array in API query
  * - 'flags'
  *  TableFilterFlagGroup that adds 'FieldName|in|value' to Filters array in API query
+ *
+ *  2D: write about remaining fuctionality
+ *  also add example
  */
 export default {
   name: "BaseTableAPI",
