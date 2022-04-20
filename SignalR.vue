@@ -16,7 +16,7 @@
             :indeterminate="!bar.value"
             :query="true"
             height="25"
-            class="mb-4"
+            class="mb-8"
           >
             <template v-slot:default="{ value }">
               <strong>{{ Math.ceil(value) }}%</strong>
@@ -42,28 +42,7 @@
       <div v-show="showProgress">
         <!-- Slot 'loop' with binded :progress for displaying list of message from SinglaR -->
         <slot name="loop" v-bind:progress="progress">
-          <v-list flat dense>
-            <v-list-item
-              v-for="(p, i) in progress"
-              :key="i"
-              :color="p.state"
-              dense
-            >
-              <v-list-item-icon v-if="p.state == 'success'">
-                <v-icon color="success">fa-check</v-icon>
-              </v-list-item-icon>
-              <v-list-item-icon v-if="p.state == 'error'">
-                <v-icon color="error">fa-exclamation-circle</v-icon>
-              </v-list-item-icon>
-              <v-list-item-icon v-if="p.state == 'warning'">
-                <v-icon color="warning">fa-exclamation-triangle</v-icon>
-              </v-list-item-icon>
-              <v-list-item-icon v-if="p.state == 'info'">
-                <v-icon color="info">fa-info-circle</v-icon>
-              </v-list-item-icon>
-              <div v-html="p.body"></div>
-            </v-list-item>
-          </v-list>
+          <base-signal-r-messages :items="progress"></base-signal-r-messages>
         </slot>
       </div>
     </div>
@@ -89,6 +68,8 @@
 
 <script>
 import signalr from "@/plugins/signalr";
+
+import BaseSignalRMessages from "./SignalRMessages";
 
 /**
  * Component for displaying progress from SignalR server while processing api request
@@ -325,6 +306,10 @@ export default {
     this.disabled = signalr.isDisabled();
     //add listener on mounted
     this.connection.on("notification", (data) => this.signalr(data));
+  },
+
+  components: {
+    BaseSignalRMessages,
   },
 };
 </script>
