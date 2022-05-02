@@ -69,7 +69,6 @@
       <!-- Optional toolbar that appears at top right above table
            and contains actions for selected rows, along with download buttons -->
       <v-toolbar
-        v-if="topToolbar"
         flat
         floating
         dense
@@ -81,10 +80,26 @@
           <slot name="selected-actions"></slot>
         </div>
 
-        <!-- Download table data button -->
-        <v-btn icon @click="downloadCSV()">
-          <v-icon v-text="downloadIcon"> </v-icon
-        ></v-btn>
+        <!-- Toolbar table buttons -->
+        <slot name="download-buttons"></slot>
+
+        <v-tooltip bottom v-if="exportPageIcon">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn icon @click="exportPage()" v-bind="attrs" v-on="on">
+              <v-icon v-text="exportPageIcon"></v-icon>
+            </v-btn>
+          </template>
+          <span>{{ $t("common.exportPage") }}</span>
+        </v-tooltip>
+
+        <v-tooltip bottom v-if="exportAllIcon">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn icon @click="exportAll()" v-bind="attrs" v-on="on">
+              <v-icon v-text="exportAllIcon"></v-icon>
+            </v-btn>
+          </template>
+          <span>{{ $t("common.exportAll") }}</span>
+        </v-tooltip>
       </v-toolbar>
     </template>
 
@@ -114,7 +129,7 @@
 </template>
 
 <script>
-import BaseTableFilter from "./TableFilter";
+import BaseTableFilter from "./Filter";
 import { mapMutations } from "vuex";
 
 /**
@@ -163,15 +178,21 @@ export default {
     },
 
     /** Show top toolbar */
-    topToolbar: {
+    hideTopToolbar: {
       type: Boolean,
-      default: true,
+      default: false,
     },
 
-    /** icon for downloading records */
-    downloadIcon: {
+    /** icon for exporting current page records */
+    exportPageIcon: {
       type: String,
-      default: "fa-file-csv",
+      default: null,
+    },
+
+    /** icon for exporting all records through message query system */
+    exportAllIcon: {
+      type: String,
+      default: null,
     },
   },
 
@@ -264,14 +285,28 @@ export default {
       return res;
     },
 
-    /** download csv with table */
-    downloadCSV() {
+    /** export current table page */
+    exportPage() {
+      var params = {
+        Page: this.options.page,
+        ItemsPerPage: this.options.itemsPerPage,
+        SortBy: this.options.sortBy.find(Boolean),
+        SortDesc: this.options.sortDesc.find(Boolean),
+        Filters: this.getFilters(),
+      };
+      //console.log(params);
+      this.$emit("export-page", params);
+    },
+
+    /** export all table */
+    exportAll() {
       var params = {
         SortBy: this.options.sortBy.find(Boolean),
         SortDesc: this.options.sortDesc.find(Boolean),
         Filters: this.getFilters(),
       };
-      this.$emit("download-csv", params, this.totalLength);
+      //console.log(params);
+      this.$emit("export-all", params, this.totalLength);
     },
   },
 

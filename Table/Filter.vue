@@ -80,11 +80,11 @@
 <script>
 import FLAGS from "@/common/flags";
 
-import BaseDateRangePicker from "./DateRangePicker";
-import BaseSelect from "./Select";
-import BaseCheckbox from "./Checkbox";
-import BaseTableFilterFlag from "./TableFilterFlag";
-import BaseTableFilterFlagGroup from "./TableFilterFlagGroup";
+import BaseDateRangePicker from "./../DateTime/DateRangePicker";
+import BaseSelect from "./../Select";
+import BaseCheckbox from "./../Checkbox";
+import BaseTableFilterFlag from "./FilterFlag";
+import BaseTableFilterFlagGroup from "./FilterFlagGroup";
 
 /**
  * Base api table filter component
