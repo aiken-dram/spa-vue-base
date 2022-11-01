@@ -1,6 +1,7 @@
 <template>
   <v-text-field
     v-model="val"
+    type="number"
     :label="tLabel ? $t(tLabel) : label"
     :hint="tHint ? $t(tHint) : hint"
     :rules="rulePreset ? getRules : rules"
@@ -13,17 +14,17 @@
 
 <script>
 /**
- * Base text field component
+ * Base number field component
  */
 export default {
-  name: "BaseTextField",
+  name: "BaseNumberField",
 
   /** attrs are passed to child component */
   inheritAttrs: false,
 
   props: {
     /** Text field value */
-    value: String,
+    value: Number,
 
     /** Label */
     label: String,
@@ -51,11 +52,6 @@ export default {
       type: Boolean,
       default: false,
     },
-
-    ruleMax: {
-      type: Number,
-      default: 0,
-    },
   },
 
   computed: {
@@ -79,12 +75,6 @@ export default {
             this.$i18n.t("forms.common.mustNotBeEmpty", {
               field: this.$i18n.t(this.tLabel),
             })
-        );
-      if (this.ruleMax > 0)
-        res.push(
-          (v) =>
-            (v || "").length <= this.ruleMax ||
-            this.$i18n.t("forms.common.maxLength", { length: this.ruleMax })
         );
       return res;
     },

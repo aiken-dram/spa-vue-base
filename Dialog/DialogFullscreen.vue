@@ -11,12 +11,12 @@
           <v-icon>fa-times-circle</v-icon>
         </v-btn>
         <v-toolbar-title>{{ title }}</v-toolbar-title>
-        <v-spacer></v-spacer>
+        <v-spacer />
         <v-toolbar-items>
           <slot name="buttons"></slot>
         </v-toolbar-items>
 
-        <template v-slot:extension v-if="extended">
+        <template v-slot:extension v-if="!dense">
           <slot name="extension"></slot>
         </template>
       </v-toolbar>
@@ -51,10 +51,10 @@ export default {
     /** title of dialog */
     title: String,
 
-    /** extended dialog (defailt: true) */
-    extended: {
+    /** Dense dialog (default: false) */
+    dense: {
       type: Boolean,
-      default: true,
+      default: false,
     },
   },
 

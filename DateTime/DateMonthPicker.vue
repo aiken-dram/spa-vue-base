@@ -35,7 +35,7 @@
       no-title
       scrollable
     >
-      <v-spacer></v-spacer>
+      <v-spacer />
       <v-btn text color="primary" @click="onOk">
         {{ $t("common.ok") }}
       </v-btn>

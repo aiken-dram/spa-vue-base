@@ -20,8 +20,9 @@
       v-for="slot in Object.keys($scopedSlots)"
       :slot="slot"
       slot-scope="scope"
-      ><slot :name="slot" v-bind="scope"
-    /></template>
+    >
+      <slot :name="slot" v-bind="scope" />
+    </template>
   </v-autocomplete>
 </template>
 
@@ -52,13 +53,13 @@ export default {
     /** select is inside toolbar */
     toolbar: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
 
   data: () => ({
     /** dictionary is being loaded from api*/
-    loading: true
+    loading: true,
   }),
 
   mounted() {
@@ -73,9 +74,9 @@ export default {
   methods: {
     /** update value */
     update(newValue) {
-      console.log(newValue);
+      //console.log(newValue);
       this.$emit("input", newValue);
-    }
+    },
   },
 
   computed: {
@@ -85,9 +86,9 @@ export default {
     citems: {
       get() {
         return this.dictionary ? this.dict(this.dictionary) : this.items;
-      }
-    }
-  }
+      },
+    },
+  },
 };
 </script>
 

@@ -1,10 +1,10 @@
 <template>
   <v-row no-gutters>
     <v-col>
-      <date-picker-input v-model="dateFrom" toolbar></date-picker-input>
+      <date-picker-input v-model="dateFrom" toolbar />
     </v-col>
     <v-col>
-      <date-picker-input v-model="dateTo" toolbar></date-picker-input>
+      <date-picker-input v-model="dateTo" toolbar />
     </v-col>
   </v-row>
 </template>

@@ -4,6 +4,8 @@
       v-model="menu"
       :close-on-content-click="false"
       offset-y
+      bottom
+      left
       max-height="500"
     >
       <template v-slot:activator="{ on, attrs }">
@@ -22,7 +24,7 @@
         </v-btn>
       </template>
       <v-list>
-        <v-subheader>Выберите поле из списка:</v-subheader>
+        <v-subheader>{{ $t("common.chooseFieldFromList") }}</v-subheader>
         <template v-for="item in search">
           <v-list-group v-if="item.children" :key="item.title">
             <template v-slot:activator>
@@ -106,7 +108,7 @@ import TextSearch from "./TextSearch";
 import NumberSearch from "./NumberSearch";
 import DateRangeSearch from ".//DateRangeSearch";
 import DictionarySearch from "./DictionarySearch";
-import DictionaryStringSearch from "./DictionaryStringSearch"; //KOSTYL
+import DictionaryStringSearch from "./DictionaryStringSearch"; //welp
 
 /**
  * Extended search toolbar component

@@ -2,11 +2,14 @@
   <v-data-iterator
     :items="items"
     :search="search"
+    :loading-text="$t('common.table.loading')"
+    :no-data-text="$t('common.table.noData')"
+    :no-results-text="$t('common.table.noResult')"
     disable-pagination
     hide-default-footer
   >
     <template v-slot:header>
-      <v-toolbar flat dense>
+      <v-toolbar v-if="!hideFilter" flat dense>
         <v-select
           v-model="search"
           :items="states"
@@ -16,7 +19,7 @@
           solo
           class=""
         ></v-select>
-        <v-spacer></v-spacer>
+        <v-spacer />
       </v-toolbar>
     </template>
 
@@ -40,7 +43,7 @@
           <v-list-item-icon v-if="p.state == 'info'">
             <v-icon color="info">fa-info-circle</v-icon>
           </v-list-item-icon>
-          <div v-html="p.body"></div>
+          <div v-html="p.body" />
         </v-list-item>
       </v-list>
     </template>
@@ -54,6 +57,12 @@ export default {
   props: {
     /** Api function that starts request */
     items: Array,
+
+    /** Hide filter option */
+    hideFilter: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   data() {

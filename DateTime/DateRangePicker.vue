@@ -48,7 +48,7 @@
       no-title
       v-bind="$attrs"
     >
-      <v-spacer></v-spacer>
+      <v-spacer />
       <v-btn text color="primary" @click="onOk">OK</v-btn>
     </v-date-picker>
   </v-menu>

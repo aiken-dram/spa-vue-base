@@ -1,22 +1,23 @@
 <template>
-  <v-text-field
+  <v-textarea
     v-model="val"
     :label="tLabel ? $t(tLabel) : label"
     :hint="tHint ? $t(tHint) : hint"
     :rules="rulePreset ? getRules : rules"
     placeholder=" "
     persistent-placeholder
+    auto-grow
     v-bind="$attrs"
     v-on="$listeners"
-  ></v-text-field>
+  ></v-textarea>
 </template>
 
 <script>
 /**
- * Base text field component
+ * Base text area component
  */
 export default {
-  name: "BaseTextField",
+  name: "BaseTextarea",
 
   /** attrs are passed to child component */
   inheritAttrs: false,

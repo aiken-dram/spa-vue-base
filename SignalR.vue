@@ -16,7 +16,7 @@
             :indeterminate="!bar.value"
             :query="true"
             height="25"
-            class="mb-8"
+            :class="barOnly ? '' : 'mb-8'"
           >
             <template v-slot:default="{ value }">
               <strong>{{ Math.ceil(value) }}%</strong>
@@ -26,30 +26,35 @@
       </slot>
     </div>
 
-    <div v-if="useItems">
-      <div v-show="showProgress" class="mt-2">
-        <div v-for="(p, i) in progress" :key="i">
-          <!-- Slot 'item' with binded :p for displaying single message from SinglaR -->
-          <slot name="item" v-bind:p="p">
-            <v-alert dense :type="p.state">
-              <div v-html="p.body"></div>
-            </v-alert>
+    <div v-if="!barOnly">
+      <div v-if="useItems">
+        <div v-show="showProgress" class="mt-2">
+          <div v-for="(p, i) in progress" :key="i">
+            <!-- Slot 'item' with binded :p for displaying single message from SinglaR -->
+            <slot name="item" v-bind:p="p">
+              <v-alert dense :type="p.state">
+                <div v-html="p.body" />
+              </v-alert>
+            </slot>
+          </div>
+        </div>
+      </div>
+      <div v-else>
+        <div v-show="showProgress">
+          <!-- Slot 'loop' with binded :progress for displaying list of message from SinglaR -->
+          <slot name="loop" v-bind:progress="progress">
+            <base-signal-r-messages
+              :items="progress"
+              :hide-filter="hideFilter"
+            />
           </slot>
         </div>
       </div>
-    </div>
-    <div v-else>
-      <div v-show="showProgress">
-        <!-- Slot 'loop' with binded :progress for displaying list of message from SinglaR -->
-        <slot name="loop" v-bind:progress="progress">
-          <base-signal-r-messages :items="progress"></base-signal-r-messages>
-        </slot>
-      </div>
-    </div>
 
-    <div v-show="showResult" class="mt-2">
-      <!-- Slot 'result' with binded :result for displaying result from API -->
-      <slot name="result" v-bind:result="result"></slot>
+      <div v-show="showResult" class="mt-2">
+        <!-- Slot 'result' with binded :result for displaying result from API -->
+        <slot name="result" v-bind:result="result"></slot>
+      </div>
     </div>
 
     <!-- Displaying error from API -->
@@ -113,10 +118,9 @@ import BaseSignalRMessages from "./SignalRMessages";
  *  finished - slot for displaying elements for when api request has been finished
  *
  *  During processing api component emits events:
- *  @set-state - changes in state (started -> running -> error/result)
- *  @on-finished - emits after api request was finished
+ *  @state - changes in state (started -> running -> error/result)
+ *  @finished - emits after api request was finished
  *
- *  2D: add progress % support
  */
 export default {
   name: "BaseSignalR",
@@ -142,6 +146,24 @@ export default {
 
     /** Response from api is different from array of signalr messages in items property */
     differentResult: {
+      type: Boolean,
+      default: false,
+    },
+
+    /** Hide filter option */
+    hideFilter: {
+      type: Boolean,
+      default: false,
+    },
+
+    /** Show only progress bar */
+    barOnly: {
+      type: Boolean,
+      default: false,
+    },
+
+    /** Start processing api request on component mount */
+    startOnMount: {
       type: Boolean,
       default: false,
     },
@@ -185,6 +207,7 @@ export default {
 
     startSignalR() {
       //1. connect to signalR hub
+      //console.log("start");
       this.bar.show = true;
       this.status = this.$i18n.t("signalr.connectingToServer");
       this.connection
@@ -192,6 +215,7 @@ export default {
         .then(() => {
           this.state = "started";
           this.status = this.$i18n.t("signalr.connectionEstablished");
+          //console.log(this.connection.connectionId);
           //2. after connected do api request
           this.api(this.connection.connectionId)
             .then(({ data }) => {
@@ -199,25 +223,25 @@ export default {
               if (!this.differentResult) this.progress = data.items;
               this.state = "result";
               this.status = this.$i18n.t("signalr.result");
-              this.$emit("set-state", "result");
+              this.$emit("state", "result");
             })
             .catch((error) => {
               this.error = error;
               this.state = "error";
               this.status = this.$i18n.t("signalr.error");
-              this.$emit("set-state", "error");
+              this.$emit("state", "error");
             })
             .finally(() => {
               this.connection.stop();
               this.bar.show = false;
-              this.$emit("on-finished");
+              this.$emit("finished");
             });
         })
         .catch((err) => {
           this.error = err;
           this.state = "error";
           this.bar.show = false;
-          this.$emit("set-state", "result");
+          this.$emit("state", "error");
         });
     },
     startNoSignalR() {
@@ -231,21 +255,23 @@ export default {
           this.result = data;
           this.state = "result";
           this.status = this.$i18n.t("signalr.result");
-          this.$emit("set-state", "result");
+          this.$emit("state", "result");
         })
         .catch((error) => {
           this.error = error;
           this.state = "error";
           this.status = this.$i18n.t("signalr.error");
-          this.$emit("set-state", "error");
+          this.$emit("state", "error");
         })
         .finally(() => {
-          this.$emit("on-finished");
+          this.$emit("finished");
         });
     },
     /** Intercepts message from SignalR server and pushes body to progress array */
     signalr(data) {
+      //console.log(this.subject);
       if (data.subject == this.subject) {
+        //console.log(data);
         if (this.state == "started") this.state = "running";
         if (data.bar) this.bar.value = data.bar;
         this.progress.push(data.body);
@@ -303,9 +329,12 @@ export default {
   },
 
   mounted() {
+    //console.log("mounted");
     this.disabled = signalr.isDisabled();
     //add listener on mounted
     this.connection.on("notification", (data) => this.signalr(data));
+
+    if (this.startOnMount) this.start();
   },
 
   components: {

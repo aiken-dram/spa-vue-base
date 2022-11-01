@@ -67,7 +67,7 @@
       </div>
 
       <v-list-item>
-        <v-spacer></v-spacer>
+        <v-spacer />
         <v-btn small @click="applyFilter">{{ $t("common.search") }}</v-btn>
         <v-btn small text @click="cancelFilter">
           {{ $t("common.cancel") }}

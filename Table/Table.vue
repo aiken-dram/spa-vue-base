@@ -73,8 +73,9 @@
       v-for="slot in Object.keys($scopedSlots)"
       :slot="slot"
       slot-scope="scope"
-      ><slot :name="slot" v-bind="scope"
-    /></template>
+    >
+      <slot :name="slot" v-bind="scope" />
+    </template>
   </v-data-table>
 </template>
 

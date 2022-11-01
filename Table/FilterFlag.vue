@@ -9,7 +9,7 @@
               <v-icon :color="g.color">{{ g.icon }}</v-icon>
             </v-btn>
           </template>
-          <span v-text="$t(g.tooltip)"></span>
+          <span v-text="$t(g.tooltip)" />
         </v-tooltip>
       </v-btn-toggle>
     </v-list-item-content>

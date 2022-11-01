@@ -23,7 +23,7 @@
       ></v-text-field>
     </template>
     <v-date-picker v-model="dateRange" locale="ru-RU" range no-title>
-      <v-spacer></v-spacer>
+      <v-spacer />
       <v-btn text color="primary" @click="setDateRange">OK</v-btn>
     </v-date-picker>
   </v-menu>

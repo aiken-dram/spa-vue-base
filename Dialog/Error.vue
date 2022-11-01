@@ -13,7 +13,7 @@
         {{ error.Error ? error.Error : error }}
       </v-card-text>
       <v-card-actions class="pt-0">
-        <v-spacer></v-spacer>
+        <v-spacer />
         <v-btn color="grey" text @click.native="cancel"> {{ t.ok }} </v-btn>
       </v-card-actions>
     </v-card>
@@ -25,7 +25,7 @@
  * Vuetify Error Dialog component
  *
  * Insert component where you want to use it:
- * <error ref="error"></error>
+ * <error ref="error" />
  *
  * Call it:
  * this.$refs.error.open('Error title', 'error message', { color: 'red' });
@@ -34,7 +34,7 @@
  * <template>
  *   <v-app>
  *     ...
- *     <error ref="error"></error>
+ *     <error ref="error" />
  *   </v-app>
  * </template>
  *

@@ -6,7 +6,7 @@
           {{ flag().icon }}
         </v-icon>
       </template>
-      <span v-html="$t(flag().tooltip)"></span>
+      <span v-html="$t(flag().tooltip)" />
     </v-tooltip>
     <v-icon v-else class="icon-invisible">fa-exclamation-circle</v-icon>
   </div>

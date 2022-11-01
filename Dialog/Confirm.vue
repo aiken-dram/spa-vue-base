@@ -11,7 +11,7 @@
       </v-toolbar>
       <v-card-text v-show="!!message" class="pa-4">{{ message }}</v-card-text>
       <v-card-actions class="pt-0">
-        <v-spacer></v-spacer>
+        <v-spacer />
         <v-btn color="primary darken-1" text @click.native="agree">
           {{ $t("common.yes") }}
         </v-btn>
@@ -28,7 +28,7 @@
  * Vuetify Confirm Dialog component
  *
  * Insert component where you want to use it:
- * <confirm ref="confirm"></confirm>
+ * <confirm ref="confirm" />
  *
  * Call it:
  * this.$refs.confirm.open('Delete', 'Are you sure?', { color: 'red' }).then((confirm) => {})
@@ -44,7 +44,7 @@
  * <template>
  *   <v-app>
  *     ...
- *     <confirm ref="confirm"></confirm>
+ *     <confirm ref="confirm" />
  *   </v-app>
  * </template>
  *

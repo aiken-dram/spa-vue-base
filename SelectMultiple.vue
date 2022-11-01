@@ -1,6 +1,8 @@
 <template>
   <v-select
     :value="value"
+    :label="tLabel ? $t(tLabel) : label"
+    :hint="tHint ? $t(tHint) : hint"
     @input="update"
     :items="dict(dictionary)"
     :loading="loading"
@@ -29,6 +31,18 @@ export default {
 
     /** select multiple dictionary name */
     dictionary: String,
+
+    /** Label */
+    label: String,
+
+    /** Translate label */
+    tLabel: String,
+
+    /** Hint */
+    hint: String,
+
+    /** Translate hint */
+    tHint: String,
   },
 
   data: () => ({

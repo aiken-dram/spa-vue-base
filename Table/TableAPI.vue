@@ -15,7 +15,9 @@
       itemsPerPageOptions: [10, 50, 100],
       itemsPerPageText: $t('common.table.page'),
     }"
+    :class="hidePointer ? null : 'table-cursor'"
     v-bind="$attrs"
+    v-on="$listeners"
   >
     <!-- Displaying error from API -->
     <template v-if="error" v-slot:no-data>
@@ -66,27 +68,29 @@
       <!-- Default slot for displaying content above table -->
       <slot></slot>
 
-      <!-- Optional toolbar that appears at top right above table
-           and contains actions for selected rows, along with download buttons -->
+      <!-- Optional toolbar that appears above table at right side
+           and contains actions for selected rows, along with toolbar and download buttons -->
       <v-toolbar
+        v-if="!hideToolbar"
         flat
-        floating
+        :floating="!fixedToolbar"
         dense
-        style="position: absolute; right: 10px; z-index: 3"
-        class="mt-n10"
+        :class="fixedToolbar ? 'fixed-toolbar' : 'mt-n10 float-toolbar'"
       >
-        <!-- Slot 'selected-actions' to display in toolbar if any rows have been selected -->
-        <div v-show="selected.length > 0" class="mr-2">
-          <slot name="selected-actions"></slot>
-        </div>
+        <v-spacer></v-spacer>
 
         <!-- Toolbar table buttons -->
-        <slot name="download-buttons"></slot>
+        <slot name="toolbar-buttons"></slot>
+
+        <!-- selected menu to display in toolbar if any rows have been selected -->
+        <v-toolbar-items v-show="selected.length > 0" class="mr-2">
+          <base-select-menu :items="actions" @selected="onSelected" />
+        </v-toolbar-items>
 
         <v-tooltip bottom v-if="exportPageIcon">
           <template v-slot:activator="{ on, attrs }">
             <v-btn icon @click="exportPage()" v-bind="attrs" v-on="on">
-              <v-icon v-text="exportPageIcon"></v-icon>
+              <v-icon v-text="exportPageIcon" />
             </v-btn>
           </template>
           <span>{{ $t("common.exportPage") }}</span>
@@ -95,7 +99,7 @@
         <v-tooltip bottom v-if="exportAllIcon">
           <template v-slot:activator="{ on, attrs }">
             <v-btn icon @click="exportAll()" v-bind="attrs" v-on="on">
-              <v-icon v-text="exportAllIcon"></v-icon>
+              <v-icon v-text="exportAllIcon" />
             </v-btn>
           </template>
           <span>{{ $t("common.exportAll") }}</span>
@@ -105,13 +109,16 @@
 
     <!-- Supported formats for columns -->
     <!-- date filter -->
-    <template v-for="h in formatDate" v-slot:[`item.${h.value}`]="{ item }">
-      {{ item[h.value] | date }}
+    <template v-for="d in formatDate" v-slot:[`item.${d.value}`]="{ item }">
+      {{ item[d.value] | date }}
     </template>
 
     <!-- datetime filter -->
-    <template v-for="h in formatDatetime" v-slot:[`item.${h.value}`]="{ item }">
-      {{ item[h.value] | datetime }}
+    <template
+      v-for="dt in formatDatetime"
+      v-slot:[`item.${dt.value}`]="{ item }"
+    >
+      {{ item[dt.value] | datetime }}
     </template>
 
     <!-- Pass on all named slots -->
@@ -130,6 +137,7 @@
 
 <script>
 import BaseTableFilter from "./Filter";
+import BaseSelectMenu from "./SelectMenu";
 import { mapMutations } from "vuex";
 
 /**
@@ -168,6 +176,12 @@ export default {
     /** table headers array */
     headers: Array,
 
+    /** actions for selected items */
+    actions: {
+      type: Array,
+      default: () => [],
+    },
+
     /** function to get data from api */
     dataTable: Function,
 
@@ -177,8 +191,14 @@ export default {
       default: () => {},
     },
 
-    /** Show top toolbar */
-    hideTopToolbar: {
+    /** Show toolbar */
+    hideToolbar: {
+      type: Boolean,
+      default: false,
+    },
+
+    /** Fixed toolbar */
+    fixedToolbar: {
       type: Boolean,
       default: false,
     },
@@ -193,6 +213,12 @@ export default {
     exportAllIcon: {
       type: String,
       default: null,
+    },
+
+    /** hmm */
+    hidePointer: {
+      type: Boolean,
+      default: false,
     },
   },
 
@@ -308,6 +334,21 @@ export default {
       //console.log(params);
       this.$emit("export-all", params, this.totalLength);
     },
+
+    /** alter data from signalR message */
+    signalr(idField, idVal, item) {
+      var i = this.items.findIndex((p) => p[idField] == idVal);
+      if (i) {
+        var fields = Object.getOwnPropertyNames(item);
+        fields.forEach((p) => {
+          this.items[i][p] = item[p];
+        });
+      }
+    },
+
+    onSelected(action) {
+      this.$emit("selected", action);
+    },
   },
 
   mounted() {},
@@ -340,6 +381,23 @@ export default {
 
   components: {
     BaseTableFilter,
+    BaseSelectMenu,
   },
 };
 </script>
+
+<style>
+.table-cursor tbody tr:hover {
+  cursor: pointer;
+}
+
+.float-toolbar {
+  position: absolute;
+  right: 10px;
+  z-index: 3;
+}
+
+.fixed-toolbar {
+  z-index: 3;
+}
+</style>

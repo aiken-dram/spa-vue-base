@@ -1,6 +1,8 @@
 <template>
   <v-select
     :value="value"
+    :label="tLabel ? $t(tLabel) : label"
+    :rules="rulePreset ? getRules : rules"
     @input="update"
     :items="citems"
     :loading="loading"
@@ -8,6 +10,7 @@
     :dense="toolbar"
     :single-line="toolbar"
     :hide-details="toolbar"
+    :persistent-placeholder="toolbar ? false : true"
     :placeholder="toolbar ? null : ' '"
     v-bind="$attrs"
   >
@@ -19,8 +22,9 @@
       v-for="slot in Object.keys($scopedSlots)"
       :slot="slot"
       slot-scope="scope"
-      ><slot :name="slot" v-bind="scope"
-    /></template>
+    >
+      <slot :name="slot" v-bind="scope" />
+    </template>
   </v-select>
 </template>
 
@@ -42,6 +46,12 @@ export default {
     /** select value */
     value: [Number, String],
 
+    /** Label */
+    label: String,
+
+    /** Translate label */
+    tLabel: String,
+
     /** (optinal) select dictionary name */
     dictionary: String,
 
@@ -50,6 +60,21 @@ export default {
 
     /** select is inside toolbar */
     toolbar: {
+      type: Boolean,
+      default: false,
+    },
+
+    /** List of rules */
+    rules: Array,
+
+    /** use preset rules */
+    rulePreset: {
+      type: Boolean,
+      default: false,
+    },
+
+    /** field is required */
+    ruleRequired: {
       type: Boolean,
       default: false,
     },
@@ -84,6 +109,20 @@ export default {
       get() {
         return this.dictionary ? this.dict(this.dictionary) : this.items;
       },
+    },
+
+    /** rules preset builder */
+    getRules() {
+      var res = [];
+      if (this.ruleRequired)
+        res.push(
+          (v) =>
+            !!v ||
+            this.$i18n.t("forms.common.mustNotBeEmpty", {
+              field: this.$i18n.t(this.tLabel),
+            })
+        );
+      return res;
     },
   },
 };

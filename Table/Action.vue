@@ -2,16 +2,18 @@
   <v-tooltip bottom max-width="500">
     <template v-slot:activator="{ on, attrs }">
       <v-icon
-        small
+        :small="small"
+        :large="large"
+        :color="color"
         class="mr-2"
-        @click="$emit('click')"
+        @click.stop="$emit('click')"
         v-bind="attrs"
         v-on="on"
       >
         {{ icon }}
       </v-icon>
     </template>
-    <span v-html="tooltip"></span>
+    <span v-html="tooltip" />
   </v-tooltip>
 </template>
 
@@ -22,6 +24,15 @@ export default {
   props: {
     icon: String,
     tooltip: String,
+    small: {
+      type: Boolean,
+      default: true,
+    },
+    large: {
+      type: Boolean,
+      default: false,
+    },
+    color: String,
   },
 };
 </script>

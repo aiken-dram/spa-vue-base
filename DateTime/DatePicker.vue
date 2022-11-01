@@ -11,7 +11,7 @@
     <template v-slot:activator="{ on, attrs }">
       <v-text-field
         v-if="toolbar"
-        :label="label"
+        :label="tLabel ? $t(tLabel) : label"
         :value="val | date"
         prepend-icon="fa-calendar-day"
         solo
@@ -26,7 +26,7 @@
       <v-text-field
         v-else-if="!readonly"
         :value="val | date"
-        :label="label"
+        :label="tLabel ? $t(tLabel) : label"
         prepend-icon="fa-calendar-day"
         placeholder=" "
         persistent-placeholder
@@ -37,7 +37,7 @@
       <v-text-field
         v-else
         :value="val | date"
-        :label="label"
+        :label="tLabel ? $t(tLabel) : label"
         prepend-icon="fa-calendar-day"
         placeholder=" "
         persistent-placeholder
@@ -70,6 +70,9 @@ export default {
 
     /** date picker label */
     label: String,
+
+    /** Translate label */
+    tLabel: String,
 
     /** date picker is readonly */
     readonly: Boolean,

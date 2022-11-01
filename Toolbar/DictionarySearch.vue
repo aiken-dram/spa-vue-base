@@ -9,7 +9,7 @@
     single-line
     hide-details
     clearable
-    no-data-text="Нет данных"
+    :no-data-text="$t('common.table.noData')"
     class="shrink"
     style="width: 400px"
   ></v-select>

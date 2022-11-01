@@ -1,6 +1,6 @@
 <template>
   <v-overlay :value="value" v-bind="$attrs" :absolute="true">
-    <v-progress-circular indeterminate :size="size"></v-progress-circular>
+    <v-progress-circular indeterminate :size="size" />
   </v-overlay>
 </template>
 

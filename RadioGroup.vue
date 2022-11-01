@@ -1,7 +1,7 @@
 <template>
   <div>
     <header>{{ label }}</header>
-    <v-progress-circular v-if="loading" indeterminate></v-progress-circular>
+    <v-progress-circular v-if="loading" indeterminate />
     <v-radio-group v-else v-model="val" v-bind="$attrs" :readonly="!isEditable">
       <v-radio
         v-for="(d, i) in citems"

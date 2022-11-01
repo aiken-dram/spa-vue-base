@@ -13,16 +13,16 @@
       </v-toolbar>
 
       <slot name="top"></slot>
-      <v-divider></v-divider>
+      <v-divider />
 
       <v-card-text style="height: 100%">
         <slot></slot>
       </v-card-text>
 
-      <v-divider></v-divider>
+      <v-divider />
 
       <v-card-actions>
-        <v-spacer></v-spacer>
+        <v-spacer />
         <slot name="buttons"></slot>
       </v-card-actions>
     </v-card>
