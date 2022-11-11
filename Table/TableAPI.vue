@@ -33,17 +33,15 @@
     </template>
 
     <!-- Displaying table filter in headers that have filter enabled -->
-    <template
-      v-for="h in filterHeaders"
-      v-slot:[`header.${h.value}`]="{ header }"
-    >
+    <template v-for="h in headers" v-slot:[`header.${h.value}`]="{ header }">
       <base-table-filter
+        v-if="h.filter"
         :key="h.name"
         :filter="h.filter"
         @set-filter="setFilter"
         @remove-filter="removeFilter"
       ></base-table-filter>
-      {{ header.text }}
+      {{ $t(header.text) }}
     </template>
 
     <!-- Displaying footer with page information -->

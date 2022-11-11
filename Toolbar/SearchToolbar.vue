@@ -30,7 +30,7 @@
             <template v-slot:activator>
               <v-list-item-content>
                 <v-list-item-title>
-                  {{ item.title }}
+                  {{ $t(item.title) }}
                 </v-list-item-title>
               </v-list-item-content>
             </template>
@@ -42,7 +42,7 @@
               <v-list-item-icon>
                 <v-icon small> {{ iconType(child.type) }}</v-icon>
               </v-list-item-icon>
-              <v-list-item-title>{{ child.title }}</v-list-item-title>
+              <v-list-item-title>{{ $t(child.title) }}</v-list-item-title>
             </v-list-item>
           </v-list-group>
           <v-list-item
@@ -50,7 +50,7 @@
             :key="item.title"
             @click="addExtendedSearch(item)"
           >
-            <v-list-item-title>{{ item.title }}</v-list-item-title>
+            <v-list-item-title>{{ $t(item.title) }}</v-list-item-title>
           </v-list-item>
         </template>
       </v-list>
@@ -70,7 +70,36 @@
           <v-icon color="error">fa-minus-square</v-icon>
         </v-btn>
 
-        <span class="mr-2"> {{ ext.title }} </span>
+        <span class="mr-2"> {{ $t(ext.title) }} </span>
+
+        <v-checkbox
+          v-if="showFilter(ext.type, 'sign')"
+          v-model="ext.sign"
+          true-value="!"
+          false-value=""
+          :label="$t('common.filters.sign')"
+          dense
+          class="mr-2 mt-4"
+        ></v-checkbox>
+
+        <v-select
+          v-if="showFilter(ext.type, 'select')"
+          v-model="ext.operator"
+          :items="getOperators(ext.type)"
+          solo
+          dense
+          single-line
+          hide-details
+          class="shrink"
+          style="width: 200px"
+        >
+          <template slot="selection" slot-scope="data">
+            {{ $t("common.filters.operators." + data.item) }}
+          </template>
+          <template slot="item" slot-scope="data">
+            {{ $t("common.filters.operators." + data.item) }}
+          </template>
+        </v-select>
 
         <text-search v-if="ext.type == 'text'" v-model="ext.filter">
         </text-search>
@@ -84,13 +113,13 @@
         </number-search>
 
         <dictionary-search
-          v-else-if="ext.type == 'dictionary'"
+          v-else-if="ext.type == 'dict'"
           v-model="ext.filter"
           :dictionary="ext.dict"
         ></dictionary-search>
 
         <dictionary-string-search
-          v-else-if="ext.type == 'dictionaryString'"
+          v-else-if="ext.type == 'dictString'"
           v-model="ext.filter"
           :dictionary="ext.dict"
         ></dictionary-string-search>
@@ -104,6 +133,8 @@
 </template>
 
 <script>
+import TABLE from "@/common/table";
+
 import TextSearch from "./TextSearch";
 import NumberSearch from "./NumberSearch";
 import DateRangeSearch from ".//DateRangeSearch";
@@ -138,10 +169,16 @@ export default {
   }),
 
   methods: {
+    showFilter(type, element) {
+      return TABLE.filters.show(type, element);
+    },
+
     addExtendedSearch(item) {
       var ext = {
         id: this.id++,
         title: item.title,
+        operator: TABLE.filters.initial(item.type),
+        sign: "",
         name: item.name,
         type: item.type,
         dict: item.dict,
@@ -161,24 +198,21 @@ export default {
       if (this.extended)
         this.extended.forEach((e) => {
           if (e.filter || e.filter === 0) {
-            switch (e.type) {
-              case "text":
-                ext.push(`${e.name}|like|${e.filter}`);
-                return;
-              case "number":
-                ext.push(`${e.name}|==|${e.filter}`);
-                return;
-              case "date":
-                ext.push(`${e.name}|date|${e.filter}`);
-                return;
-              case "dictionary":
-              case "dictionaryString":
-                ext.push(`${e.name}|==|${e.filter}`);
-                return;
-            }
+            ext.push(
+              TABLE.filters.getExtended(
+                `${e.sign}${e.operator}`,
+                e.type,
+                e.name,
+                e.filter
+              )
+            );
           }
         });
       return ext;
+    },
+
+    getOperators(type) {
+      return TABLE.filters.operators(type);
     },
 
     clear() {
@@ -193,12 +227,16 @@ export default {
           return "fa-calendar-alt";
         case "number":
           return "fa-sort";
-        case "dictionary":
-        case "dictionaryString":
+        case "dict":
+        case "dictString":
           return "fa-list";
       }
       return "";
     },
+  },
+
+  created() {
+    this.TABLE = TABLE;
   },
 
   components: {

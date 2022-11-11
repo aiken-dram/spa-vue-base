@@ -12,7 +12,7 @@
       <v-text-field
         v-if="toolbar"
         :value="dateRangeText"
-        :label="label"
+        :label="tLabel ? $t(tLabel) : label"
         prepend-icon="fa-calendar-day"
         solo
         dense
@@ -31,7 +31,7 @@
       <v-text-field
         v-else
         :value="dateRangeText"
-        :label="label"
+        :label="tLabel ? $t(tLabel) : label"
         prepend-icon="fa-calendar-day"
         placeholder=" "
         persistent-placeholder
@@ -69,6 +69,9 @@ export default {
 
     /** date range picker label */
     label: String,
+
+    /** Translate label */
+    tLabel: String,
 
     /** date range picker is inside toolbar */
     toolbar: {

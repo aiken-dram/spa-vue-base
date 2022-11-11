@@ -13,42 +13,77 @@
     </template>
 
     <v-list dense>
+      <v-list-item v-if="showFilter()">
+        <v-checkbox
+          v-if="showFilter('sign')"
+          v-model="sign"
+          true-value="!"
+          false-value=""
+          :label="$t('common.filters.sign')"
+          dense
+          class="mr-2 mb-4"
+        ></v-checkbox>
+        <v-select
+          v-if="showFilter('select')"
+          v-model="operator"
+          :items="getOperators()"
+          solo
+          dense
+        >
+          <template slot="selection" slot-scope="data">
+            {{ $t("common.filters.operators." + data.item) }}
+          </template>
+          <template slot="item" slot-scope="data">
+            {{ $t("common.filters.operators." + data.item) }}
+          </template>
+        </v-select>
+      </v-list-item>
+
       <v-list-item v-if="filter.type == 'text'">
+        <v-text-field v-model="text" outlined dense></v-text-field>
+      </v-list-item>
+
+      <v-list-item v-if="filter.type == 'number'">
         <v-text-field
-          v-model="text"
-          :label="filter.label"
-          placeholder=" "
-          persistent-placeholder
+          v-model.number="number"
+          type="number"
+          outlined
+          dense
         ></v-text-field>
       </v-list-item>
 
       <v-list-item v-if="filter.type == 'mask'">
         <v-text-field
           v-model="text"
-          :label="filter.label"
           v-facade="filter.mask"
-          placeholder=" "
-          persistent-placeholder
+          t-label="common.filters.mask"
+          outlined
+          dense
         ></v-text-field>
       </v-list-item>
 
       <v-list-item v-if="filter.type == 'date'">
         <base-date-range-picker
           v-model="dateRange"
-          :label="filter.label"
+          t-label="common.filters.date"
         ></base-date-range-picker>
       </v-list-item>
 
       <v-list-item v-if="filter.type == 'dict'">
         <base-select
           v-model="dict"
-          :label="filter.label"
+          t-label="common.filters.dict"
           :dictionary="filter.dictionary"
+          dense
         ></base-select>
       </v-list-item>
 
       <v-list-item v-if="filter.type == 'checkbox'">
-        <base-checkbox v-model="checkbox" :label="filter.label"></base-checkbox>
+        <base-checkbox
+          v-model="checkbox"
+          :t-label="filter.label"
+          dense
+        ></base-checkbox>
       </v-list-item>
 
       <div v-if="filter.type == 'flags'">
@@ -79,6 +114,7 @@
 
 <script>
 import FLAGS from "@/common/flags";
+import TABLE from "@/common/table";
 
 import BaseDateRangePicker from "./../DateTime/DateRangePicker";
 import BaseSelect from "./../Select";
@@ -102,11 +138,20 @@ export default {
     /** show filter menu */
     show: false,
 
+    /** operator for filter */
+    operator: null,
+
+    /** boolean sign for filter */
+    sign: "",
+
     /** filter is active */
     active: false,
 
     /** filter value for text */
     text: null,
+
+    /** filter value for number */
+    number: null,
 
     /** filter value for dictionary */
     dict: null,
@@ -122,50 +167,34 @@ export default {
   }),
 
   methods: {
-    getFlag(name, value) {
-      //value can be undefined or array?
-      var f = FLAGS[name];
-
-      if (value && value.length > 0)
-        return value.map((v) => f[v].value).join(",");
-
-      return null;
+    getOperators() {
+      return TABLE.filters.operators(this.filter.type);
     },
-    /** get filter */
-    getFilter() {
-      switch (this.filter.type) {
-        case "text":
-          return `${this.filter.name}|like|${this.text}`;
-        case "date":
-          return `${this.filter.name}|date|${this.dateRange.join(" ~ ")}`;
-        case "mask":
-          return `${this.filter.name}|==|${this.text}`;
-        case "dict":
-          return `${this.filter.name}|==|${this.dict}`;
-        case "checkbox":
-          return `${this.filter.name}|==|${this.checkbox}`;
-        case "flags":
-          return this.filter.flags.map((p) => {
-            if (p.group)
-              return `${p.group
-                .map((q) => q.field)
-                .join(",")}|group|${this.flags[p.name].join(",")}`;
-            else
-              return `${p.field}|in|${this.getFlag(
-                p.name,
-                this.flags[p.name]
-              )}`;
-          });
-        default:
-          return null;
-      }
+    showFilter(element) {
+      return TABLE.filters.show(this.filter.type, element);
     },
 
     /** applies this filter to parent table component */
     applyFilter() {
       this.active = true;
       this.show = false;
-      this.$emit("set-filter", this.filter.name, this.getFilter());
+      this.$emit(
+        "set-filter",
+        this.filter.name,
+        TABLE.filters.getFilter(
+          `${this.sign}${this.operator}`,
+          this.filter.type,
+          this.filter.name,
+          this.text,
+          this.number,
+          this.dateRange,
+          this.dict,
+          this.checkbox,
+          this.filter.flags,
+          this.flags,
+          FLAGS
+        )
+      );
     },
 
     /** cancel this filter from parent table component */
@@ -174,6 +203,11 @@ export default {
       this.show = false;
       this.$emit("remove-filter", this.filter.name);
     },
+  },
+
+  mounted() {
+    /** default operator */
+    this.operator = TABLE.filters.initial(this.filter.type);
   },
 
   computed: {

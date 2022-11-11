@@ -1,6 +1,7 @@
 <template>
   <v-checkbox
     v-model="val"
+    :label="tLabel ? $t(tLabel) : label"
     true-value="T"
     false-value="F"
     v-bind="$attrs"
@@ -18,6 +19,12 @@ export default {
   props: {
     /** checkbox value */
     value: String,
+
+    /** Label */
+    label: String,
+
+    /** Translate label */
+    tLabel: String,
   },
 
   computed: {
